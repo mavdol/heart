@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+@layer base {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 30 10% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 20%;
+
+    --primary: 33 32% 90%; /* ← Votre couleur ! */
+    --primary-foreground: 30 15% 15%; /* ← Marron très foncé pour contraste */
+
+    --secondary: 35 25% 94%;
+    --secondary-foreground: 30 10% 20%;
+    --muted: 35 25% 94%;
+    --muted-foreground: 30 8% 45%;
+
+    --accent: 33 32% 85%; /* Version légèrement plus foncée */
+    --accent-foreground: 30 15% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 33 20% 85%;
+    --input: 33 20% 85%;
+    --ring: 33 32% 90%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 25 8% 8%;
+    --foreground: 35 15% 92%;
+
+    --card: 25 10% 11%;
+    --card-foreground: 35 15% 92%;
+
+    --popover: 25 12% 10%;
+    --popover-foreground: 35 15% 92%;
+
+    --primary: 33 35% 65%;
+    --primary-foreground: 25 15% 10%;
+
+    --secondary: 28 12% 18%;
+    --secondary-foreground: 35 12% 88%;
+
+    --muted: 28 10% 16%;
+    --muted-foreground: 30 8% 60%;
+
+    --accent: 35 28% 25%;
+    --accent-foreground: 35 20% 95%;
+
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 35 15% 98%;
+
+    --border: 28 12% 20%;
+    --input: 28 12% 18%;
+
+    --ring: 33 35% 60%;
+  }
+}

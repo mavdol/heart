@@ -1,0 +1,183 @@
+use serde::{Deserialize, Serialize};
+use std::env;
+use std::fmt;
+use std::process::Command;
+
+use reqwest::Client;
+
+#[derive(Debug)]
+pub enum LLMServiceError {
+    ReqwestError(String),
+    ParseError(String),
+    Other(String),
+}
+
+impl fmt::Display for LLMServiceError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LLMServiceError::ReqwestError(msg) => write!(f, "Reqwest error: {}", msg),
+            LLMServiceError::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            LLMServiceError::Other(msg) => write!(f, "Other error: {}", msg),
+        }
+    }
+}
+
+impl From<reqwest::Error> for LLMServiceError {
+    fn from(error: reqwest::Error) -> Self {
+        eprintln!("reqwest::Error: {:?}", error);
+        LLMServiceError::ReqwestError(error.to_string())
+    }
+}
+
+impl From<serde_json::Error> for LLMServiceError {
+    fn from(error: serde_json::Error) -> Self {
+        eprintln!("serde_json::Error: {:?}", error);
+        LLMServiceError::ParseError(error.to_string())
+    }
+}
+
+impl From<std::io::Error> for LLMServiceError {
+    fn from(error: std::io::Error) -> Self {
+        eprintln!("std::io::Error: {:?}", error);
+        LLMServiceError::Other(error.to_string())
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatMessage {
+    pub role: String,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OllamaChatRequest {
+    model: String,
+    messages: Vec<ChatMessage>,
+    stream: bool,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct OllamaRequest {
+    model: String,
+    prompt: String,
+    stream: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OllamaChatResponse {
+    model: String,
+    created_at: String,
+    message: ChatResponse,
+    done: bool,
+    done_reason: String,
+    total_duration: u64,
+    load_duration: u64,
+    prompt_eval_count: u64,
+    prompt_eval_duration: u64,
+    eval_count: u64,
+    eval_duration: u64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct OllamaResponse {
+    model: String,
+    created_at: String,
+    response: String,
+    done: bool,
+    done_reason: String,
+    total_duration: u64,
+    load_duration: u64,
+    prompt_eval_count: u64,
+    prompt_eval_duration: u64,
+    eval_count: u64,
+    eval_duration: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatResponse {
+    pub role: String,
+    pub content: String,
+}
+
+#[derive(Clone)]
+pub struct LlmService {
+    client: Client,
+    ollama_host: String,
+    pub(crate) ollama_model: String,
+}
+
+impl LlmService {
+    pub fn new() -> Result<Self, LLMServiceError> {
+        let ollama_host = env::var("OLLAMA_HOST").unwrap_or_else(|_| "http://localhost:11434".to_string());
+        let ollama_model = env::var("OLLAMA_MODEL").unwrap_or_else(|_| "llama3.2".to_string());
+        let client = Client::new();
+
+        Ok(Self {
+            client,
+            ollama_host,
+            ollama_model,
+        })
+    }
+
+    pub fn is_model_installed(&self) -> Result<bool, LLMServiceError> {
+        let output = Command::new("ollama").arg("list").output()?;
+
+        if !output.status.success() {
+            return Ok(false);
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+
+        Ok(stdout.contains(&self.ollama_model))
+    }
+
+    pub fn check_ollama_installed(&self) -> bool {
+        Command::new("ollama").arg("--version").output().is_ok()
+    }
+
+    pub async fn is_ollama_running(&self) -> Result<bool, LLMServiceError> {
+        match self.client.get(&self.ollama_host).send().await {
+            Ok(response) => Ok(response.status().is_success()),
+            Err(_) => Ok(false),
+        }
+    }
+
+    pub async fn generate_chat_response(&self, messages: Vec<ChatMessage>) -> Result<ChatResponse, LLMServiceError> {
+        let request = OllamaChatRequest {
+            model: self.ollama_model.clone(),
+            messages,
+            stream: false,
+        };
+
+        let ollama_response: OllamaChatResponse = self
+            .client
+            .post(format!("{}/api/chat", self.ollama_host))
+            .json(&request)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(ollama_response.message)
+    }
+
+    pub async fn generate_response(&self, prompt: &str) -> Result<String, LLMServiceError> {
+        let request = OllamaRequest {
+            model: self.ollama_model.clone(),
+            prompt: prompt.to_string(),
+            stream: false,
+        };
+
+        let ollama_response: OllamaResponse = self
+            .client
+            .post(format!("{}/api/generate", self.ollama_host))
+            .json(&request)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(ollama_response.response)
+    }
+}
+

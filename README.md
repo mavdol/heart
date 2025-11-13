@@ -2,7 +2,7 @@
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/tauri-%2324C8DB.svg?style=flat&logo=tauri&logoColor=white)](https://tauri.app/)
 
-![banner](public/images/banner.png)
+![banner](public/banner.png)
 
 <div align="center">
 
@@ -34,7 +34,7 @@ Heart uses **Russell's Circumplex Model**, a scientifically-proven framework tha
 
 Thanks to the [NPC Neural Affect Matrix](https://github.com/mavdol/npc-neural-affect-matrix), we directly derive valence and arousal values from each interaction and convert them into natural language emotions.
 
-![emotion visualization](public/images/variant-emotions.png)
+![emotion visualization](public/variant-emotions.png)
 
 🔗 **Visualize emotions live**: [Interactive Valence-Arousal Explorer](https://valence-arousal-visualizer.vercel.app/)
 
@@ -63,19 +63,8 @@ When a memory is retrieved frequently, it resurfaces through the layers and can 
 Before you begin, ensure you have the following installed:
 
 - **[Ollama](https://ollama.com/)** — Used for better inference performance and easier model switching
-
-  ```bash
-  # After installing Ollama, pull a model:
-  ollama pull llama2
-  ```
-
 - **[Node.js](https://nodejs.org/)** (v18 or higher)
-- **[pnpm](https://pnpm.io/)** — Fast, disk space efficient package manager
-
-  ```bash
-  npm install -g pnpm
-  ```
-
+- **[pnpm](https://pnpm.io/)** — Fast, disk space
 - **[Rust](https://rust-lang.org/)** — Required for Tauri
   ```bash
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -83,26 +72,14 @@ Before you begin, ensure you have the following installed:
 
 ### Installation
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/yourusername/heart.git
-   cd heart
-   ```
-
 2. **Install dependencies**
 
    ```bash
    pnpm install
-   ```
-
-3. **Run in development mode**
-
-   ```bash
    pnpm run tauri dev
    ```
 
-4. **Build for production**
+3. **Build for production**
    ```bash
    pnpm run tauri build
    ```

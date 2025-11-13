@@ -56,7 +56,7 @@ impl EmotionService {
             },
             personality: PersonalityTraits::default(),
             memory: MemoryConfig {
-                decay_rate: 0.000014, // emotion loses 70% of its weight every day
+                decay_rate: 0.000007, // emotion loses 35% of its weight every day
             },
         };
 

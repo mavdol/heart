@@ -3,6 +3,7 @@ use crate::services::{ChatMessage, ChatResponse};
 use crate::utils::{ApiSuccessResponse, AppError, AppResult};
 use npc_neural_affect_matrix::EmotionPrediction;
 use tauri::{AppHandle, Manager, State};
+use tauri_plugin_store::StoreExt;
 use tokio::sync::Mutex;
 
 #[tauri::command]
@@ -39,7 +40,11 @@ pub async fn destroy_brain(app_handle: AppHandle) -> AppResult<ApiSuccessRespons
         .map_err(|e| AppError::Internal(e.to_string()))?;
 
     std::fs::remove_dir_all(app_data_dir.join("heart_memory.lance")).map_err(|e| AppError::Internal(e.to_string()))?;
-    std::fs::remove_file(app_data_dir.join("heart.json")).map_err(|e| AppError::Internal(e.to_string()))?;
+
+    let store = app_handle.store("heart.json").map_err(|e| AppError::Internal(e.to_string()))?;
+    store.clear();
+
+    eprintln!("Brain destroyed");
     Ok(ApiSuccessResponse::new(()))
 }
 

@@ -77,6 +77,10 @@ impl EmotionService {
         let exctrated_records: Vec<EmotionMemoryRecord> = records
             .into_iter()
             .filter_map(|record| {
+                if record.metadata.get("role").unwrap_or(&"".to_string()) != "user" {
+                    return None;
+                }
+
                 let content = record.metadata.get("content")?.to_string();
                 let valence = record
                     .metadata
@@ -127,10 +131,7 @@ impl EmotionService {
     }
 
     pub async fn get_current_emotion(self) -> Result<EmotionPrediction, EmotionServiceError> {
-        let mut npc_current_emotion = self.npc_emotion.lock().await.calculate_current_emotion()?;
-
-        npc_current_emotion.valence = (npc_current_emotion.valence * 100.0).round() / 100.0;
-        npc_current_emotion.arousal = (npc_current_emotion.arousal * 100.0).round() / 100.0;
+        let npc_current_emotion = self.npc_emotion.lock().await.calculate_current_emotion()?;
 
         Ok(npc_current_emotion)
     }

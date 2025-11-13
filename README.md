@@ -21,6 +21,8 @@
 - **🎭 Evolving Personalities**: Characters change and grow based on their experiences with you
 - **🧠 Complex Memory Layers**: Three vectorial memory layers (hot, warm, and cold) that mimic human memory retention and recall
 
+![screen](public/screen.png)
+
 ---
 
 ## 🎯 How It Works
@@ -32,7 +34,7 @@ Heart uses **Russell's Circumplex Model**, a scientifically-proven framework tha
 - **Valence (X-axis)**: How pleasant or unpleasant the emotion feels (-1 to +1)
 - **Arousal (Y-axis)**: How energetic or calm the emotion is (-1 to +1)
 
-Thanks to the [NPC Neural Affect Matrix](https://github.com/mavdol/npc-neural-affect-matrix), we directly derive valence and arousal values from each interaction and convert them into natural language emotions.
+With the [NPC Neural Affect Matrix](https://github.com/mavdol/npc-neural-affect-matrix), we directly derive valence and arousal values from each interaction and convert them into natural language emotions.
 
 ![emotion visualization](public/variant-emotions.png)
 
@@ -64,18 +66,20 @@ Before you begin, ensure you have the following installed:
 
 - **[Ollama](https://ollama.com/)** — Used for better inference performance and easier model switching
 - **[Node.js](https://nodejs.org/)** (v18 or higher)
-- **[pnpm](https://pnpm.io/)** — Fast, disk space
-- **[Rust](https://rust-lang.org/)** — Required for Tauri
-  ```bash
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-  ```
+- **[pnpm](https://pnpm.io/)** package manager
+- **[Rust](https://rust-lang.org/)**
 
 ### Installation
 
-2. **Install dependencies**
+1. **Install dependencies**
 
    ```bash
    pnpm install
+   ```
+
+2. **Run in development mode**
+
+   ```bash
    pnpm run tauri dev
    ```
 
@@ -83,6 +87,12 @@ Before you begin, ensure you have the following installed:
    ```bash
    pnpm run tauri build
    ```
+
+---
+
+## ⚠️ Limitations
+
+- **Language Support**: The NPC Neural Affect Matrix is currently trained only in English. While the LLM can handle other languages, the neural matrix may not accurately understand or process non-English text.
 
 ---
 

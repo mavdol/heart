@@ -262,7 +262,7 @@ impl Brain {
                 (
                     "message_sent".to_string(),
                     assistant_now.format("%A %d %B %Y %H:%M:%S").to_string(),
-                ),
+                )
             ]);
 
             let user_message_metadata = HashMap::from([
@@ -274,6 +274,7 @@ impl Brain {
                     "message_sent".to_string(),
                     user_timestamp.format("%A %d %B %Y %H:%M:%S").to_string(),
                 ),
+                ("past_time".to_string(), (user_timestamp.timestamp() - birthday.timestamp()).to_string()),
             ]);
 
             let user_metadata_json = match serde_json::to_string(&user_message_metadata) {

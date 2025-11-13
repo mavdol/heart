@@ -94,22 +94,10 @@ Contributions are welcome! This project is perfect for experimentation and learn
 
 1. **Fork the repository**
 2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
 3. **Make your changes** and add tests if applicable
 4. **Run the test suite**
-   ```bash
-   cargo test
-   ```
 5. **Commit your changes**
-   ```bash
-   git commit -m "Add your meaningful commit message"
-   ```
 6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
 7. **Submit a pull request** with a clear description of your changes
 
 ---

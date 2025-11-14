@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fmt;
+use std::path::PathBuf;
 use std::process::Command;
 
 use reqwest::Client;
@@ -104,6 +105,7 @@ pub struct LlmService {
     client: Client,
     ollama_host: String,
     pub(crate) ollama_model: String,
+    ollama_binary_path: Option<PathBuf>,
 }
 
 impl LlmService {
@@ -112,15 +114,87 @@ impl LlmService {
         let ollama_model = env::var("OLLAMA_MODEL").unwrap_or_else(|_| "llama3.2".to_string());
         let client = Client::new();
 
+        let ollama_binary_path = Self::find_ollama_binary();
+
         Ok(Self {
             client,
             ollama_host,
             ollama_model,
+            ollama_binary_path,
         })
     }
 
+    fn find_ollama_binary() -> Option<PathBuf> {
+        #[cfg(target_os = "windows")]
+        let (which_cmd, binary_name) = ("where", "ollama.exe");
+
+        #[cfg(not(target_os = "windows"))]
+        let (which_cmd, binary_name) = ("which", "ollama");
+
+        if let Ok(output) = Command::new(which_cmd).arg(binary_name).output() {
+            if output.status.success() {
+                let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                if !path_str.is_empty() {
+                    let first_path = path_str.lines().next().unwrap_or(&path_str);
+                    return Some(PathBuf::from(first_path));
+                }
+            }
+        }
+
+        #[cfg(target_os = "windows")]
+        let common_paths = vec![
+            r"C:\Program Files\Ollama\ollama.exe",
+            r"C:\Program Files (x86)\Ollama\ollama.exe",
+            format!(r"{}\AppData\Local\Programs\Ollama\ollama.exe",
+                env::var("USERPROFILE").unwrap_or_default()),
+        ];
+
+        #[cfg(target_os = "macos")]
+        let common_paths = vec![
+            "/usr/local/bin/ollama",
+            "/opt/homebrew/bin/ollama",
+            "/usr/bin/ollama",
+            "/opt/local/bin/ollama",
+        ];
+
+        #[cfg(target_os = "linux")]
+        let common_paths = vec![
+            "/usr/local/bin/ollama",
+            "/usr/bin/ollama",
+            "/opt/ollama/bin/ollama",
+            format!("{}/.local/bin/ollama",
+                env::var("HOME").unwrap_or_default()),
+        ];
+
+        for path in common_paths {
+            let path_buf = PathBuf::from(path);
+            if path_buf.exists() && path_buf.is_file() {
+                return Some(path_buf);
+            }
+        }
+
+        None
+    }
+
+    fn get_ollama_command(&self) -> Command {
+        if let Some(ref path) = self.ollama_binary_path {
+            Command::new(path)
+        } else {
+            Command::new("ollama")
+        }
+    }
+
+    pub fn get_ollama_binary_path(&self) -> String {
+        if let Some(ref path) = self.ollama_binary_path {
+            path.to_string_lossy().to_string()
+        } else {
+            "ollama".to_string()
+        }
+    }
+
     pub fn is_model_installed(&self) -> Result<bool, LLMServiceError> {
-        let output = Command::new("ollama").arg("list").output()?;
+        let mut cmd = self.get_ollama_command();
+        let output = cmd.arg("list").output()?;
 
         if !output.status.success() {
             return Ok(false);
@@ -132,7 +206,12 @@ impl LlmService {
     }
 
     pub fn check_ollama_installed(&self) -> bool {
-        Command::new("ollama").arg("--version").output().is_ok()
+        if self.ollama_binary_path.is_some() {
+            return true;
+        }
+
+        let mut cmd = self.get_ollama_command();
+        cmd.arg("--version").output().is_ok()
     }
 
     pub async fn is_ollama_running(&self) -> Result<bool, LLMServiceError> {

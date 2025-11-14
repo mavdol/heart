@@ -58,7 +58,9 @@ pub async fn download_model(
         )
         .map_err(|e| AppError::Tauri(e.to_string()))?;
 
-    let mut child = Command::new("ollama")
+    let ollama_path = llm_service.get_ollama_binary_path();
+
+    let mut child = Command::new(ollama_path)
         .arg("pull")
         .arg(&llm_service.ollama_model)
         .stdout(Stdio::piped())

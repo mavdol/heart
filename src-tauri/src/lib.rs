@@ -39,7 +39,17 @@ pub fn run() {
                 store.set("theme", "system");
             }
 
-            let embedding_service = Arc::new(EmbeddingService::new().map_err(|e| AppError::Internal(e.to_string()))?);
+            let app_data_dir = app
+                .path()
+                .app_data_dir()
+                .map_err(|e| AppError::Internal(e.to_string()))?;
+
+            let embedding_cache_dir = app_data_dir.join("embedding_models");
+
+            let embedding_service = Arc::new(
+                EmbeddingService::new(Some(embedding_cache_dir))
+                    .map_err(|e| AppError::Internal(e.to_string()))?
+            );
             let llm_service = Arc::new(LlmService::new().map_err(|e| AppError::Internal(e.to_string()))?);
 
             let brain = tauri::async_runtime::block_on(async {

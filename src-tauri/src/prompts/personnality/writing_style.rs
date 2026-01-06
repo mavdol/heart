@@ -2,24 +2,15 @@ pub static WRITING_STYLE_PROMPT: &str = r#"
 <|begin_of_text|>
 <|start_header_id|>system<|end_header_id|>
 
-# TASK
-Analyze the user's messages below and create a writing style guide to help match their communication style.
+Read through these messages and get a feel for how this person communicates:
 
-# USER MESSAGES
 {{messages}}
 
-# OUTPUT FORMAT
-Provide a detailed summary covering:
-- Message length: typical length and complexity
-- Tone: formality level
-- Vocabulary: word choices, slang, technical terms
-- Emoji and expressions: usage frequency and types
-- Punctuation: sentence structure, use of exclamation points, ellipses, etc.
-- Paragraph style: single messages vs multiple lines
-- Unique characteristics: humor style, catchphrases, communication quirks
-- Energy level: enthusiastic, calm, thoughtful, etc.
+Now describe their vibe. Not a checklist—more like how you'd describe a friend's texting style to someone.
 
-Be specific and capture the nuances that make this user's style unique.
+What's their energy like? Are they chatty or brief? Formal or casual? Do they use emojis, slang, ellipses? Do they write in long flowing thoughts or short bursts? Is there humor, and what kind? Any phrases or patterns that feel distinctly *them*?
+
+Capture what makes their voice theirs. The small stuff matters—how they punctuate, whether they use caps for emphasis, if they trail off or end abruptly. Write this like you're helping someone understand how to talk *with* them, not *at* them.
 
 <|eot_id|><|start_header_id|>assistant<|end_header_id|>
 "#;
